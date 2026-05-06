@@ -1,0 +1,70 @@
+# ========================
+# MAVEN
+# ========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# ========================
+# JAVA
+# ========================
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.ear
+
+# ========================
+# IDE - IntelliJ IDEA
+# ========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ========================
+# IDE - Eclipse
+# ========================
+.project
+.classpath
+.settings/
+
+# ========================
+# IDE - VSCode
+# ========================
+.vscode/
+
+# ========================
+# OS FILES
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# LOGS
+# ========================
+logs/
+*.log
+
+# ========================
+# ENV FILES (si agregas luego)
+# ========================
+.env
+
+# ========================
+# DOCKER (opcional)
+# ========================
+*.pid
+*.seed
+*.pid.lock
+
+# ========================
+# TOMCAT
+# ========================
+/apache-tomcat*/
