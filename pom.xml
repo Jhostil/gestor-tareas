@@ -43,6 +43,30 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- Source: https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2 -->
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>2.39.1</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Source: https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server -->
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>2.39.1</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Source: https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-common -->
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <version>2.39.1</version>
+      <scope>compile</scope>
+    </dependency>
+
     <!-- Source: https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8 -->
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
@@ -70,7 +94,13 @@
   </dependencies>
 
   <build>
-    <finalName>gestor-tareas</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
+      </plugin>
+    </plugins>
   </build>
 
 </project>
