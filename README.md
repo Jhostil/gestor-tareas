@@ -10,8 +10,8 @@ REST API para gestión de tareas, construida con Java + JAX-RS y Oracle XE vía 
 - JDBC puro
 - Oracle XE 21c (Docker)
 - PL/SQL — Packages, Triggers, Sequences
-- Apache Tomcat
-- Maven
+- Apache Tomcat 9
+- Maven 3.8
 
 ---
 
@@ -46,6 +46,18 @@ Oracle DB — TASK_PKG (PL/SQL)
 
 Contiene los procedimientos: `GET_ALL_TASKS`, `GET_TASK_BY_ID`, `CREATE_TASK`, `UPDATE_TASK`, `DELETE_TASK`.
 
+**Datos de conexión**
+
+| Campo | Valor |
+|---|---|
+| Host | localhost |
+| Puerto | 1521 |
+| Usuario | TASKS_USER |
+| Password | password |
+| Service | XEPDB1 |
+ 
+---
+
 ---
 # Configuración y ejecución del proyecto
 
@@ -70,26 +82,60 @@ docker-compose up -d
 
 ## Ejecutar el backend
 
+
+## Despliegue
+
+### Opción 1 — Apache Tomcat (manual)
+
+**1. Generar el WAR**
+
 ```bash
-mvn clean install
+mvn clean package
 ```
 
-Copiar el `.war` generado en `tomcat/webapps/`, o ejecutar directamente desde el IDE.
+El archivo queda en `target/gestor-tareas.war`.
 
+**2. Copiar el WAR a Tomcat**
+
+Linux/Mac:
+```bash
+cp target/gestor-tareas.war /opt/tomcat/webapps/
+```
+
+Windows: copiar manualmente el `.war` a `TOMCAT_HOME\webapps\`.
+
+**3. Iniciar Tomcat**
+
+Linux/Mac:
+```bash
+sh /opt/tomcat/bin/startup.sh
+```
+
+Windows:
+```bat
+startup.bat
+```
+ 
+---
+
+### Opción 2 — IntelliJ IDEA
+
+1. Ir a **Run → Edit Configurations**
+2. Agregar nueva configuración: **Tomcat Server → Local**
+3. En la pestaña **Deployment**, presionar `+` y seleccionar `Artifact → gestor-tareas:war exploded`
+4. Definir el **Application Context**, por ejemplo: `/gestor-tareas`
+5. Ejecutar con el botón Run. La URL resultante sería:
+
+```
+http://localhost:8080/gestor-tareas/api/tasks
+```
+ 
 ---
 
 ## API Reference
 
-La URL base depende de:
-
-- El puerto configurado localmente en Apache Tomcat
-- El context path configurado localmente para la aplicación
-
-Ejemplo de entorno local:
-
-`
-http://localhost:8080/gestor-tareas/api/tasks
-`
+Base URL: `http://localhost:8080/gestor-tareas/api/tasks`
+## EndPoints
 
 **GET** `/api/tasks` — Obtener todas las tareas
 
@@ -125,3 +171,4 @@ http://localhost:8080/gestor-tareas/api/tasks
 - El `TASK_ID` se genera automáticamente mediante una secuencia
 - La serialización JSON la realiza JAX-RS
 - CORS habilitado para desarrollo local
+- Los scripts SQL de creación de tablas, secuencias, triggers y paquetes se ejecutan automáticamente al iniciar el contenedor Oracle.
