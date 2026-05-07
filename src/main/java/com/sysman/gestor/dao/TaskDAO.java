@@ -18,58 +18,122 @@ public class TaskDAO {
      */
     public List<Task> getAllTasks() {
 
-        List<Task> tasks = new ArrayList<>();
+        List<Task> list = new ArrayList<>();
 
         String sql = "{ call TASK_PKG.GET_ALL_TASKS(?) }";
 
         try (Connection conn = DBConnection.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+             CallableStatement cs = conn.prepareCall(sql)) {
 
-            stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
-            stmt.execute();
+            cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+            cs.execute();
 
-            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
+            try (ResultSet rs = (ResultSet) cs.getObject(1)) {
+
                 while (rs.next()) {
                     Task task = new Task();
                     task.setTaskId(rs.getLong("TASK_ID"));
                     task.setTitle(rs.getString("TITLE"));
                     task.setDescription(rs.getString("DESCRIPTION"));
                     task.setCompleted(rs.getInt("COMPLETED"));
+                    task.setCreatedAt(rs.getTimestamp("CREATED_AT"));
+                    task.setUpdatedAt(rs.getTimestamp("UPDATED_AT"));
 
-                    tasks.add(task);
+                    list.add(task);
                 }
             }
+
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage(), e);
         }
-        return tasks;
+
+        return list;
+    }
+
+    /**
+     * Obtiene una tarea dado su identificador
+     * @return Retorna la tarea si existe
+     */
+    public Task getTaskById(Long id) {
+
+        String sql = "{ call TASK_PKG.GET_TASK_BY_ID(?, ?) }";
+
+        try (Connection conn = DBConnection.getConnection();
+             CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setLong(1, id);
+            cs.registerOutParameter(2, oracle.jdbc.OracleTypes.CURSOR);
+            cs.execute();
+
+            try (ResultSet rs = (ResultSet) cs.getObject(2)) {
+
+                if (rs.next()) {
+                    Task task = new Task();
+                    task.setTaskId(rs.getLong("TASK_ID"));
+                    task.setTitle(rs.getString("TITLE"));
+                    task.setDescription(rs.getString("DESCRIPTION"));
+                    task.setCompleted(rs.getInt("COMPLETED"));
+                    task.setCreatedAt(rs.getTimestamp("CREATED_AT"));
+                    task.setUpdatedAt(rs.getTimestamp("UPDATED_AT"));
+                    return task;
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return null;
     }
 
     /**
      * Método para crear una tarea
      * @param task Tarea a guardar
+     * @return Retorna la tarea que se creó
      */
     public Task createTask(Task task) {
 
-        String sql = "INSERT INTO TASKS (TITLE, DESCRIPTION, COMPLETED) VALUES (?, ?, ?)";
+        String sql = "{ call TASK_PKG.CREATE_TASK(?, ?, ?, ?) }";
+
+        try {
+
+            Connection conn = DBConnection.getConnection();
+            CallableStatement cs = conn.prepareCall(sql);
+
+            cs.setString(1, task.getTitle());
+            cs.setString(2, task.getDescription());
+            cs.setInt(3, task.getCompleted());
+
+            cs.registerOutParameter(4, java.sql.Types.NUMERIC);
+
+            cs.execute();
+
+            long generatedId = cs.getLong(4);
+            return getTaskById(generatedId);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Método que permite actualizar una tarea
+     * @param task Tarea a actualizar
+     */
+    public void updateTask(Task task) {
+
+        String sql = "{ call TASK_PKG.UPDATE_TASK(?, ?, ?, ?) }";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             CallableStatement cs = conn.prepareCall(sql)) {
 
-            ps.setString(1, task.getTitle());
-            ps.setString(2, task.getDescription());
-            ps.setInt(3, task.getCompleted());
+            cs.setLong(1, task.getTaskId());
+            cs.setString(2, task.getTitle());
+            cs.setString(3, task.getDescription());
+            cs.setInt(4, task.getCompleted());
 
-            ps.executeUpdate();
+            cs.execute();
 
-            try (Statement st = conn.createStatement();
-                 ResultSet rs = st.executeQuery("SELECT TASK_SEQ.CURRVAL FROM dual")) {
-
-                if (rs.next()) {
-                    task.setTaskId(rs.getLong(1));
-                }
-            }
-            return task;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
