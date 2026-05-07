@@ -28,5 +28,22 @@ public class TaskResource {
                     .build();
         }
     }
-    
+    /**
+     * Endpoint para obtener todas las tareas
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createTask(Task task) {
+        try {
+            Task taskCreated = taskDAO.createTask(task);
+            return Response.status(Response.Status.CREATED)
+                    .entity(taskCreated)
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al crear la tarea: " + e.getMessage())
+                    .build();
+        }
+    }
 }
