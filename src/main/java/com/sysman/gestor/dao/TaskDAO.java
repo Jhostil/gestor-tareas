@@ -44,7 +44,7 @@ public class TaskDAO {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Error al obtener las tareas " + e.getMessage(), e);
         }
 
         return list;
@@ -80,7 +80,7 @@ public class TaskDAO {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Error al obtener la tarea "+ e.getMessage(), e);
         }
 
         return null;
@@ -95,10 +95,8 @@ public class TaskDAO {
 
         String sql = "{ call TASK_PKG.CREATE_TASK(?, ?, ?) }";
 
-        try {
-
-            Connection conn = DBConnection.getConnection();
-            CallableStatement cs = conn.prepareCall(sql);
+        try (Connection conn = DBConnection.getConnection();
+             CallableStatement cs = conn.prepareCall(sql)) {
 
             cs.setString(1, task.getTitle());
             cs.setString(2, task.getDescription());
@@ -111,7 +109,7 @@ public class TaskDAO {
             return getTaskById(generatedId);
 
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Error al crear la tarea " + e.getMessage(), e);
         }
     }
 
@@ -134,7 +132,27 @@ public class TaskDAO {
             cs.execute();
 
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Error al actualizar la tarea " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Método que permite eliminar una tarea
+     * @param id Identificador de la tarea a eliminar
+     */
+    public void deleteTask(Long id) {
+
+        String sql = "{ call TASK_PKG.DELETE_TASK(?) }";
+
+        try (Connection conn = DBConnection.getConnection();
+             CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setLong(1, id);
+
+            cs.execute();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar la tarea " + e.getMessage(), e);
         }
     }
 }

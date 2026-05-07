@@ -24,7 +24,7 @@ public class TaskResource {
             return Response.ok(tasks).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al obtener las tareas: " + e.getMessage())
+                    .entity( e.getMessage())
                     .build();
         }
     }
@@ -48,7 +48,7 @@ public class TaskResource {
             }
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al obtener las tareas: " + e.getMessage())
+                    .entity( e.getMessage())
                     .build();
         }
     }
@@ -67,7 +67,7 @@ public class TaskResource {
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al crear la tarea: " + e.getMessage())
+                    .entity(e.getMessage())
                     .build();
         }
     }
@@ -89,13 +89,46 @@ public class TaskResource {
                     .build();
         }
         try {
+
+            int completed = task.getCompleted();
+
+            if (completed != 0 && completed != 1) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Completed debe ser 0 o 1")
+                        .build();
+            }
+
             task.setTaskId(id);
             taskDAO.updateTask(task);
-            return Response.ok(task).build();
+            return Response.ok().build();
 
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al actualizar la tarea: " + e.getMessage())
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteTask(@PathParam("id") Long id) {
+
+        Task existing = taskDAO.getTaskById(id);
+
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("La tarea no existe")
+                    .build();
+        }
+        try {
+            taskDAO.deleteTask(id);
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
                     .build();
         }
     }
