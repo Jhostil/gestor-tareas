@@ -93,7 +93,7 @@ public class TaskDAO {
      */
     public Task createTask(Task task) {
 
-        String sql = "{ call TASK_PKG.CREATE_TASK(?, ?, ?, ?) }";
+        String sql = "{ call TASK_PKG.CREATE_TASK(?, ?, ?) }";
 
         try {
 
@@ -102,13 +102,12 @@ public class TaskDAO {
 
             cs.setString(1, task.getTitle());
             cs.setString(2, task.getDescription());
-            cs.setInt(3, task.getCompleted());
 
-            cs.registerOutParameter(4, java.sql.Types.NUMERIC);
+            cs.registerOutParameter(3, java.sql.Types.NUMERIC);
 
             cs.execute();
 
-            long generatedId = cs.getLong(4);
+            long generatedId = cs.getLong(3);
             return getTaskById(generatedId);
 
         } catch (Exception e) {
